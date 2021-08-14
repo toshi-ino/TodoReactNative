@@ -3,14 +3,12 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   TouchableOpacity,
-  ListItem,
   FlatList,
   Pressable,
 } from "react-native";
 import { CheckBox } from "react-native-elements";
-import { ProgressBar, Colors } from "react-native-paper";
+import { ProgressBar } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const styles = StyleSheet.create({
@@ -92,7 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   centerContainer: {
-    width: 200,
+    width: 220,
     flexDirection: "column",
     marginStart: 10,
     justifyContent: "center",
@@ -212,7 +210,7 @@ export const IncompleteTodos = (props) => {
           const isOneTodo = index === 0 ? true : false;
 
           return (
-            <View>
+            <View key={index}>
               {isOneTodo && (
                 <ProgressBar
                   progress={checkedCount()}
@@ -220,7 +218,7 @@ export const IncompleteTodos = (props) => {
                   style={styles.styleProgressBar}
                 />
               )}
-              <View key={index} style={styles.boxOutline}>
+              <View style={styles.boxOutline}>
                 <View style={styles.leftContainer}>
                   <CheckBox
                     checked={todo.checked}

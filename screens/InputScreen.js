@@ -44,8 +44,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderWidth: 1,
     borderColor: "#DDDDDD",
-    maxHeight: 4 * 20,
-    minHeight: 4 * 20,
+    maxHeight: 4 * 23,
+    minHeight: 4 * 23,
+    paddingTop: 10,
+    paddingBottom: 10,
     paddingStart: 10,
     paddingEnd: 10,
     borderRadius: 5,
@@ -165,7 +167,8 @@ export default function InputTodo({ route }) {
                 };
               })
             }
-            height={30}
+            height={35}
+            maxLength={12}
           />
         </View>
 
@@ -183,8 +186,9 @@ export default function InputTodo({ route }) {
               editable={true}
               placeholder="期限を入力してください"
               value={todoText.dueday}
-              height={30}
+              height={35}
               onFocus={() => showDatePicker()}
+              maxLength={15}
             />
           </View>
         </View>
@@ -193,6 +197,9 @@ export default function InputTodo({ route }) {
           <Text style={styles.textInputBar}>コメント</Text>
           <View style={styles.commemtBox}>
             <TextInput
+              style={{
+                textAlignVertical: "top",
+              }}
               multiline={true}
               numberOfLines={4}
               editable={disabled}
@@ -206,7 +213,8 @@ export default function InputTodo({ route }) {
                   };
                 })
               }
-              height={4 * 20}
+              height={4 * 17}
+              maxLength={150}
             />
           </View>
         </View>
@@ -220,10 +228,7 @@ export default function InputTodo({ route }) {
         >
           <Text style={styleButtonOK}>OK</Text>
         </Pressable>
-        <Pressable
-          style={styles.button}
-          onPress={() => navigation.navigate("Home")}
-        >
+        <Pressable style={styles.button} onPress={() => navigation.goBack()}>
           <Text style={styles.customBtnText}>キャンセル</Text>
         </Pressable>
       </View>

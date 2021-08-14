@@ -27,7 +27,11 @@ export default function AppNavigator() {
           component={DetailTodo}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Edit" component={EditTodo} />
+        <Stack.Screen
+          name="Edit"
+          component={EditTodo}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

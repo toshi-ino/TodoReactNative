@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Alert, SafeAreaView } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import React, { useState } from "react";
 import { IncompleteTodos } from "../components/IncompleteTodos";
 
@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
   //   padding: 8,
   // },
   container: {
+    marginTop: 30,
     alignItems: "center",
   },
   imcompleteArea: {
