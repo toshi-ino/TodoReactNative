@@ -185,7 +185,7 @@ export default function EditTodo({ route }) {
               })
             }
             height={35}
-            maxLength={15}
+            maxLength={12}
           />
         </View>
 
