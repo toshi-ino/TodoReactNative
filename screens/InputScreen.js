@@ -4,12 +4,13 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
   Pressable,
   SafeAreaView,
   Alert,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { API, graphqlOperation } from "aws-amplify";
+import { createTodo } from "../src/graphql/mutations";
 
 const styles = StyleSheet.create({
   inputScreenContainer: {
@@ -86,10 +87,8 @@ const styles = StyleSheet.create({
 });
 
 export default function InputTodo({ route }) {
-  // const { todoText, setTodo, onPress, disabled } = route.params;
-  const { disabled, incompleteTodos, setIncompleteTodos, navigation } =
-    route.params;
-  const [todoText, setTodoText] = useState({
+  const { navigation } = route.params;
+  const [todo, setTodo] = useState({
     title: "",
     dueday: "",
     commemt: "",
@@ -106,7 +105,6 @@ export default function InputTodo({ route }) {
   };
 
   const handleConfirm = (date) => {
-    // console.log("A date has been picked:" + date);
     const selectedDate =
       date.getFullYear() +
       "年" +
@@ -115,7 +113,7 @@ export default function InputTodo({ route }) {
       date.getDate() +
       "日";
 
-    setTodoText((prevState) => {
+    setTodo((prevState) => {
       return {
         ...prevState,
         dueday: selectedDate,
@@ -125,29 +123,22 @@ export default function InputTodo({ route }) {
     hideDatePicker();
   };
 
-  const isInputedTitle = todoText.title === "" ? true : false;
+  const isInputedTitle = todo.title !== "" ? true : false;
 
-  const styleButtonOK = !isInputedTitle
+  const styleButtonOK = isInputedTitle
     ? styles.customBtnText
     : styles.customBtnTextDisable;
 
-  const onPressAdd = () => {
-    // if (todoText === "") return;
-    const newTodos = [...incompleteTodos, todoText];
-    setIncompleteTodos(newTodos);
-    setTodoText({
-      title: "",
-      dueday: "",
-      commemt: "",
-      checked: false,
-    });
+  async function onPressAdd() {
+    try {
+      await API.graphql(graphqlOperation(createTodo, { input: todo }));
+    } catch (err) {
+      console.log("error creating todo:", err);
+    }
 
     Alert.alert("", "新しいTodoを追加しました");
-
-    navigation.navigate("Home");
-  };
-
-  // console.log(todoText);
+    navigation.goBack();
+  }
 
   return (
     <SafeAreaView style={styles.inputScreenContainer}>
@@ -156,11 +147,10 @@ export default function InputTodo({ route }) {
           <Text style={styles.textInputBar}>タイトル</Text>
           <TextInput
             style={styles.inputBar}
-            editable={disabled}
             placeholder="タイトルを入力してください"
-            value={todoText.title}
+            value={todo.title}
             onChangeText={(text) =>
-              setTodoText((prevState) => {
+              setTodo((prevState) => {
                 return {
                   ...prevState,
                   title: text,
@@ -183,9 +173,8 @@ export default function InputTodo({ route }) {
           <View>
             <TextInput
               style={styles.inputBar}
-              editable={true}
               placeholder="期限を入力してください"
-              value={todoText.dueday}
+              value={todo.dueday}
               height={35}
               onFocus={() => showDatePicker()}
               maxLength={15}
@@ -202,11 +191,10 @@ export default function InputTodo({ route }) {
               }}
               multiline={true}
               numberOfLines={4}
-              editable={disabled}
               placeholder="コメントを入力してください"
-              value={todoText.commemt}
+              value={todo.commemt}
               onChangeText={(text) =>
-                setTodoText((prevState) => {
+                setTodo((prevState) => {
                   return {
                     ...prevState,
                     commemt: text,
@@ -224,7 +212,7 @@ export default function InputTodo({ route }) {
         <Pressable
           style={styles.button}
           onPress={onPressAdd}
-          disabled={isInputedTitle}
+          disabled={!isInputedTitle}
         >
           <Text style={styleButtonOK}>OK</Text>
         </Pressable>

@@ -1,10 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  TextInput,
-  TouchableOpacity,
   Pressable,
   SafeAreaView,
   Alert,
@@ -12,6 +10,10 @@ import {
 } from "react-native";
 import { CheckBox, Divider } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { deleteTodo } from "../src/graphql/mutations";
+import { getTodo } from "../src/graphql/queries";
+import { API, graphqlOperation } from "aws-amplify";
+import { useIsFocused } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   detailScreenContainer: {
@@ -157,51 +159,49 @@ const styles = StyleSheet.create({
 });
 
 export default function DetailTodo({ route }) {
-  // export const DetailTodos = (props) => {
-  //   const { todos, onPressEdit, indexForDetailTodo, onPressDelete } = route;
-  const {
-    todos,
-    indexForDetailTodo,
-    incompleteTodos,
-    setIncompleteTodos,
-    setDetailTodo,
-    navigation,
-    setEditTodo,
-  } = route.params;
+  const { idDetail, navigation } = route.params;
+  const [todo, setTodo] = useState([]);
 
-  const onPressDelete = (index) => {
+  async function getTodoDetail() {
+    try {
+      const todoData = await API.graphql(
+        graphqlOperation(getTodo, { id: idDetail })
+      );
+      const todoBeforeSet = todoData.data.getTodo;
+      setTodo(todoBeforeSet);
+    } catch (err) {
+      console.log("error fetching todos");
+    }
+  }
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    getTodoDetail();
+  }, [isFocused]);
+
+  const onPressDelete = (id) => {
     Alert.alert(
       "",
       "Todoを削除しますか？",
       [
-        { text: "Ok", onPress: () => onPressOKAlert(index) },
+        { text: "Ok", onPress: () => onPressOKAlert(id) },
         { text: "キャンセル" },
       ],
       { cancelable: false }
     );
   };
 
-  const onPressOKAlert = (index) => {
-    const newTodos = [...incompleteTodos];
-    newTodos.splice(index, 1);
-    setIncompleteTodos(newTodos);
-    //削除しても詳細画面の情報が残っていたためクリアする
-    setDetailTodo({});
+  async function onPressOKAlert(id) {
+    await API.graphql(graphqlOperation(deleteTodo, { input: { id } }));
 
     Alert.alert("", "Todoを削除しました");
     navigation.goBack();
-  };
+  }
 
   const onPressEdit = (index) => {
-    // setEditTodo(detailTodo);
-    // setIndexForEditTodo(index);
-
     navigation.navigate("Edit", {
-      editTodoBase: todos,
-      setTodo: setEditTodo,
-      incompleteTodos: incompleteTodos,
-      setIncompleteTodos: setIncompleteTodos,
-      indexForEditTodo: index,
+      idEdit: idDetail,
       navigation: navigation,
     });
   };
@@ -225,14 +225,14 @@ export default function DetailTodo({ route }) {
       <View style={styles.containerButton}>
         <Pressable
           style={styles.styleButtonMain}
-          onPress={() => onPressEdit(indexForDetailTodo)}
+          onPress={() => onPressEdit(idDetail)}
         >
           <Icon name="pencil" size={18} color="white" />
           <Text style={styles.textButtonMain}>Todoを編集</Text>
         </Pressable>
         <Pressable
           style={styles.styleButtonDelete}
-          onPress={() => onPressDelete(indexForDetailTodo)}
+          onPress={() => onPressDelete(idDetail)}
         >
           <Icon name="trash" size={18} color="white" />
           <Text style={styles.textButtonMain}>Todoを削除</Text>
@@ -242,17 +242,17 @@ export default function DetailTodo({ route }) {
       <View style={styles.styleTodoBoxOutline}>
         <View style={styles.containerUpper}>
           <View style={styles.containerLeft}>
-            <CheckBox checked={todos.checked} />
+            <CheckBox checked={todo.checked} />
           </View>
           <View style={styles.containerCenter}>
             <View style={styles.ajustCenterItem}>
               <View style={styles.containerCentarUpper}>
-                <Text style={styles.textStyle}>{todos.title}</Text>
+                <Text style={styles.textStyle}>{todo.title}</Text>
               </View>
               <View style={styles.containerCenterLower}>
                 <Text style={styles.styletextStyleDueday}>
                   <Icon name="clock-o" size={14} color={"#BBBBBB"} />
-                  {todos.dueday}
+                  {todo.dueday}
                 </Text>
               </View>
             </View>
@@ -263,7 +263,7 @@ export default function DetailTodo({ route }) {
         <View style={styles.containerLower}>
           <ScrollView>
             <View style={styles.ajustLowerItem}>
-              <Text style={styles.textStyle}>{todos.commemt}</Text>
+              <Text style={styles.textStyle}>{todo.commemt}</Text>
             </View>
           </ScrollView>
         </View>

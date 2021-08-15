@@ -4,13 +4,15 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
   Pressable,
   SafeAreaView,
   Alert,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { navigation } from "@react-navigation/native-stack";
+import { updateTodo } from "../src/graphql/mutations";
+import { useIsFocused } from "@react-navigation/native";
+import { getTodo } from "../src/graphql/queries";
+import { API, graphqlOperation } from "aws-amplify";
 
 const styles = StyleSheet.create({
   containerInputScreen: {
@@ -87,35 +89,28 @@ const styles = StyleSheet.create({
   },
 });
 
-// const showDatePicker = () => {
-//   return <DateTimePickerModal isVisible={true} mode="date" />;
-// };
-
 export default function EditTodo({ route }) {
-  //   const { editTodo, setTodo, onPressUpdate, indexForEditTodo } = props;
-  const {
-    editTodoBase,
-    setTodo,
-    incompleteTodos,
-    setIncompleteTodos,
-    indexForEditTodo,
-    navigation,
-  } = route.params;
-  //   console.log(editTodo);
-  //   console.log(indexForEditTodo);
+  const { idEdit, navigation } = route.params;
+  const [todo, setTodo] = useState({});
+  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
 
-  const [editTodo, setEditTodo] = useState({
-    title: "",
-    dueday: "",
-    commemt: "",
-    checked: false,
-  });
+  async function getTodoDetail() {
+    try {
+      const todoData = await API.graphql(
+        graphqlOperation(getTodo, { id: idEdit })
+      );
+      const todoBeforeSet = todoData.data.getTodo;
+      setTodo(todoBeforeSet);
+    } catch (err) {
+      console.log("error fetching todos");
+    }
+  }
+
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    setEditTodo(editTodoBase);
-  }, []);
-
-  const [datePickerVisibility, setDatePickerVisibility] = useState(false);
+    getTodoDetail();
+  }, [isFocused]);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -126,7 +121,6 @@ export default function EditTodo({ route }) {
   };
 
   const handleConfirm = (date) => {
-    // console.log("A date has been picked:" + date);
     const selectedDate =
       date.getFullYear() +
       "年" +
@@ -135,7 +129,7 @@ export default function EditTodo({ route }) {
       date.getDate() +
       "日";
 
-    setEditTodo((prevState) => {
+    setTodo((prevState) => {
       return {
         ...prevState,
         dueday: selectedDate,
@@ -145,27 +139,26 @@ export default function EditTodo({ route }) {
     hideDatePicker();
   };
 
-  const isInputedTitle = editTodo.title === "" ? true : false;
+  const isInputedTitle = todo.title === "" ? true : false;
 
   const styleButtonOK = !isInputedTitle
     ? styles.customBtnText
     : styles.customBtnTextDisable;
 
-  const onPressUpdate = (index) => {
-    const newIncompleteTodos = [...incompleteTodos];
-    newIncompleteTodos.splice(index, 1);
-    newIncompleteTodos.splice(index, 0, editTodo);
-
-    setIncompleteTodos(newIncompleteTodos);
-    setEditTodo({});
-
+  async function onPressUpdate(id) {
+    await API.graphql(
+      graphqlOperation(updateTodo, {
+        input: {
+          id: todo.id,
+          title: todo.title,
+          dueday: todo.dueday,
+          commemt: todo.commemt,
+        },
+      })
+    );
     Alert.alert("", "Todoの内容を変更しました");
-
     navigation.navigate("Home");
-
-    // //編集後に詳細画面の情報が残っていたためクリアする
-    // setDetailTodo({});
-  };
+  }
 
   return (
     <SafeAreaView style={styles.containerInputScreen}>
@@ -175,9 +168,9 @@ export default function EditTodo({ route }) {
           <TextInput
             style={styles.inputBar}
             placeholder="タイトルを入力"
-            value={editTodo.title}
+            value={todo.title}
             onChangeText={(text) =>
-              setEditTodo((prevState) => {
+              setTodo((prevState) => {
                 return {
                   ...prevState,
                   title: text,
@@ -203,7 +196,7 @@ export default function EditTodo({ route }) {
                 style={styles.inputBar}
                 editable={true}
                 placeholder="期限を入力してください"
-                value={editTodo.dueday}
+                value={todo.dueday}
                 height={35}
                 onFocus={() => showDatePicker()}
                 maxLength={15}
@@ -220,9 +213,9 @@ export default function EditTodo({ route }) {
               multiline={true}
               numberOfLines={4}
               placeholder="コメントを入力"
-              value={editTodo.commemt}
+              value={todo.commemt}
               onChangeText={(text) =>
-                setEditTodo((prevState) => {
+                setTodo((prevState) => {
                   return {
                     ...prevState,
                     commemt: text,
@@ -239,7 +232,7 @@ export default function EditTodo({ route }) {
       <View style={styles.containerButton}>
         <Pressable
           style={styles.button}
-          onPress={() => onPressUpdate(indexForEditTodo)}
+          onPress={() => onPressUpdate(idEdit)}
           disabled={isInputedTitle}
         >
           <Text style={styleButtonOK}>追加</Text>

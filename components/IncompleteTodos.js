@@ -1,15 +1,10 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  FlatList,
-  Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import { CheckBox } from "react-native-elements";
 import { ProgressBar } from "react-native-paper";
+import { updateTodo } from "../src/graphql/mutations";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { API, graphqlOperation } from "aws-amplify";
 
 const styles = StyleSheet.create({
   topContainer: {
@@ -122,19 +117,22 @@ const styles = StyleSheet.create({
 });
 
 export const IncompleteTodos = (props) => {
-  const {
-    todos,
-    onPressInput,
-    navigationDetail,
-    setDetailTodo,
-    setIndexForDetailTodo,
-  } = props;
+  const { todos, navigation, isOverTodoNUmber } = props;
   const [checked, setChecked] = useState(false);
 
-  const onPressCheckBox = (index) => {
+  async function onPressCheckBox(index) {
     todos[index].checked = !todos[index].checked;
     setChecked(!checked);
-  };
+
+    await API.graphql(
+      graphqlOperation(updateTodo, {
+        input: {
+          id: todos[index].id,
+          checked: todos[index].checked,
+        },
+      })
+    );
+  }
 
   const checkedCount = () => {
     let count = 0;
@@ -157,18 +155,17 @@ export const IncompleteTodos = (props) => {
     return ratio.toFixed(2);
   };
 
-  // const navigationDetail = (todo, index) => {
-  //   navigation.navigate("Detail", {
-  //     todos: todo,
-  //     indexForDetailTodo: index,
-  //   });
-  // };
+  const onPressDetail = (id) => {
+    navigation.navigate("Detail", {
+      navigation: navigation,
+      idDetail: id,
+    });
+  };
 
-  const onPressDetail = (index, todo) => {
-    setDetailTodo(todos[index]);
-    setIndexForDetailTodo(index);
-
-    navigationDetail(todo, index);
+  const onPressInput = (id) => {
+    navigation.navigate("Input", {
+      navigation: navigation,
+    });
   };
 
   const isNullTodos = todos.length === 0 ? true : false;
@@ -184,7 +181,11 @@ export const IncompleteTodos = (props) => {
         <Pressable style={styles.buttonTransparent}>
           <Text></Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={onPressInput}>
+        <Pressable
+          style={styles.button}
+          onPress={onPressInput}
+          disabled={isOverTodoNUmber}
+        >
           <Icon name="plus-circle" size={18} color="white" />
           <Text style={styles.customBtnText}>Todoを作成</Text>
         </Pressable>
@@ -238,7 +239,7 @@ export const IncompleteTodos = (props) => {
                   </View>
                 </View>
                 <View style={styles.ligthContainer}>
-                  <Pressable onPress={() => onPressDetail(index, todo)}>
+                  <Pressable onPress={() => onPressDetail(todo.id)}>
                     <Icon name="chevron-right" size={20} color={"#00BFFF"} />
                   </Pressable>
                 </View>
