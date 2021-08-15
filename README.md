@@ -1,6 +1,6 @@
 # TODO アプリ
 
-フロントエンド：ReactNative(Javascript)
-API 言語：GraphQL（AWS Amplify）
-データベース：DaynamoDB（AWS Amplify）
-auth 追加：（AWS Amplify)
+フロントエンド：ReactNative(Javascript)<br>
+API 言語：GraphQL（AWS Amplify）<br>
+データベース：DaynamoDB（AWS Amplify）<br>
+auth 追加：（AWS Amplify)<br>
