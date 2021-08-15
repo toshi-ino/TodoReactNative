@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const IncompleteTodos = (props) => {
+export const TodoList = (props) => {
   const { todos, navigation, isOverTodoNUmber } = props;
   const [checked, setChecked] = useState(false);
 

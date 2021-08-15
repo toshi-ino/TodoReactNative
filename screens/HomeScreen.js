@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
-import { IncompleteTodos } from "../components/IncompleteTodos";
+import { TodoList } from "../components/TodoList";
 import { API, graphqlOperation } from "aws-amplify";
 import { listTodos } from "../src/graphql/queries";
 
@@ -43,7 +43,7 @@ export default function HomeScreen(props) {
         <Text style={{ color: "red" }}>登録できるtodoは5個まで</Text>
       )}
       <View style={styles.imcompleteArea}>
-        <IncompleteTodos
+        <TodoList
           todos={todos}
           navigation={navigation}
           isOverTodoNUmber={isOverTodoNumber}
