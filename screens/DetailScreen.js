@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "column",
   },
   containerTopButton: {
     marginTop: 5,
@@ -156,10 +157,23 @@ const styles = StyleSheet.create({
     color: "black",
     marginEnd: 10,
   },
+  conteinarTextCreatedAtUpdatedAt: {
+    width: "100%",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+    marginEnd: 40,
+  },
+  ajustTextCreatedAtUpdatedAt: {
+    justifyContent: "flex-end",
+  },
+  textCreatedAtUpdatedAt: {
+    fontSize: 12,
+    color: "gray",
+  },
 });
 
-export default function DetailTodo({ route }) {
-  const { idDetail, navigation } = route.params;
+export default function DetailTodo({ navigation, route }) {
+  const { idDetail } = route.params;
   const [todo, setTodo] = useState([]);
 
   async function getTodoDetail() {
@@ -202,8 +216,66 @@ export default function DetailTodo({ route }) {
   const onPressEdit = (index) => {
     navigation.navigate("Edit", {
       idEdit: idDetail,
-      navigation: navigation,
     });
+  };
+
+  const indicateDate = (date) => {
+    let dateChanged = "";
+    if (date == null) {
+      return (dateChanged = "");
+    } else if (typeof date === "string") {
+      return (dateChanged = convertFromStringToDate(date));
+    } else {
+      return (dateChanged = "");
+    }
+
+    return dateChanged;
+  };
+
+  const convertFromStringToDate = (responseDate) => {
+    let dateComponents = String(responseDate).split("T");
+    let datePieces = String(dateComponents[0]).split("-");
+    let timePieces = String(dateComponents[1]).split(":");
+
+    let dateDate = new Date(
+      datePieces[0],
+      datePieces[1] - 1,
+      datePieces[2],
+      timePieces[0],
+      timePieces[1],
+      timePieces[2].slice(0, 2)
+    );
+    dateDate.setHours(dateDate.getHours() + 9);
+
+    dateComponents = [];
+    datePieces = [];
+    timePieces = [];
+    const dateDateJp = dateDate.toLocaleString("ja");
+
+    dateComponents = String(dateDateJp).split(" ");
+    datePieces = String(dateComponents[0]).split("/");
+    timePieces = String(dateComponents[1]).split(":");
+
+    if (String(datePieces[1]).length === 1) {
+      datePieces[1] = "0" + datePieces[1];
+    }
+    if (String(timePieces[0]).length === 1) {
+      timePieces[0] = "0" + timePieces[0];
+    }
+    let dateChanged =
+      datePieces[0] +
+      "/" +
+      datePieces[1] +
+      "/" +
+      datePieces[2] +
+      " " +
+      timePieces[0] +
+      ":" +
+      timePieces[1] +
+      ":" +
+      timePieces[2];
+
+    return dateChanged;
   };
 
   return (
@@ -266,6 +338,16 @@ export default function DetailTodo({ route }) {
               <Text style={styles.textStyle}>{todo.commemt}</Text>
             </View>
           </ScrollView>
+        </View>
+      </View>
+      <View style={styles.conteinarTextCreatedAtUpdatedAt}>
+        <View style={styles.ajustTextCreatedAtUpdatedAt}>
+          <Text style={styles.textCreatedAtUpdatedAt}>
+            作成日 : {indicateDate(todo.createdAt)}
+          </Text>
+          <Text style={styles.textCreatedAtUpdatedAt}>
+            更新日 : {indicateDate(todo.updatedAt)}
+          </Text>
         </View>
       </View>
     </SafeAreaView>

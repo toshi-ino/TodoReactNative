@@ -1,17 +1,39 @@
-import { StyleSheet, Text, View, SafeAreaView } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Pressable } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
 import { TodoList } from "../components/TodoList";
-import { API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation, Auth } from "aws-amplify";
 import { listTodos } from "../src/graphql/queries";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const styles = StyleSheet.create({
   container: {
     marginTop: 30,
     alignItems: "center",
   },
-  imcompleteArea: {
+  containerTodoList: {
     width: "100%",
+  },
+  containerButttonSignout: {
+    width: "100%",
+    justifyContent: "flex-end",
+    flexDirection: "row",
+    marginTop: 10,
+    marginEnd: 20,
+  },
+  buttonSingOut: {
+    height: 25,
+    width: 100,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#DDDDDD",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    flexDirection: "row",
+  },
+  textButtonSignout: {
+    marginStart: 8,
   },
 });
 
@@ -42,12 +64,21 @@ export default function HomeScreen(props) {
       {todos.length >= 5 && (
         <Text style={{ color: "red" }}>登録できるtodoは5個まで</Text>
       )}
-      <View style={styles.imcompleteArea}>
-        <TodoList
-          todos={todos}
-          navigation={navigation}
-          isOverTodoNUmber={isOverTodoNumber}
-        />
+
+      <View style={styles.containerButttonSignout}>
+        <Pressable
+          style={styles.buttonSingOut}
+          onPress={() => {
+            Auth.signOut();
+          }}
+        >
+          <Icon name="sign-out" size={18} color="gray" />
+          <Text style={styles.textButtonSignout}>Signout</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.containerTodoList}>
+        <TodoList todos={todos} isOverTodoNUmber={isOverTodoNumber} />
       </View>
     </SafeAreaView>
   );

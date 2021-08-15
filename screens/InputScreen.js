@@ -13,19 +13,19 @@ import { API, graphqlOperation } from "aws-amplify";
 import { createTodo } from "../src/graphql/mutations";
 
 const styles = StyleSheet.create({
-  inputScreenContainer: {
+  containerInputScreen: {
     width: "100%",
     flex: 1,
     alignItems: "center",
   },
-  inputBarContainer: {
+  containerInputBar: {
     width: "90%",
   },
-  titleContainer: {
+  containeTitle: {
     marginTop: 80,
     width: "100%",
   },
-  inputBar: {
+  styleInputBar: {
     width: "100%",
     height: 1,
     paddingStart: 10,
@@ -34,13 +34,13 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 5,
   },
-  duedayContainer: {
+  containerDueday: {
     marginTop: 10,
   },
-  commemtContainer: {
+  containerCommemt: {
     marginTop: 10,
   },
-  commemtBox: {
+  styleCommemtBox: {
     width: "100%",
     backgroundColor: "white",
     borderWidth: 1,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     paddingEnd: 10,
     borderRadius: 5,
   },
-  buttonContainer: {
+  containerButton: {
     flex: 1,
     width: "90%",
     alignItems: "flex-end",
@@ -62,14 +62,14 @@ const styles = StyleSheet.create({
     marginEnd: 20,
     flexDirection: "row",
   },
-  customBtnText: {
+  styleTextBtn: {
     fontSize: 16,
     color: "#00BFFF",
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "bold",
   },
-  button: {
+  styleButton: {
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     height: 20,
     width: 80,
   },
-  customBtnTextDisable: {
+  styleTextBtnDisable: {
     fontSize: 16,
     color: "gray",
     alignItems: "center",
@@ -86,8 +86,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function InputTodo({ route }) {
-  const { navigation } = route.params;
+export default function InputTodo({ navigation }) {
   const [todo, setTodo] = useState({
     title: "",
     dueday: "",
@@ -126,8 +125,8 @@ export default function InputTodo({ route }) {
   const isInputedTitle = todo.title !== "" ? true : false;
 
   const styleButtonOK = isInputedTitle
-    ? styles.customBtnText
-    : styles.customBtnTextDisable;
+    ? styles.styleTextBtn
+    : styles.styleTextBtnDisable;
 
   async function onPressAdd() {
     try {
@@ -141,12 +140,12 @@ export default function InputTodo({ route }) {
   }
 
   return (
-    <SafeAreaView style={styles.inputScreenContainer}>
-      <View style={styles.inputBarContainer}>
-        <View style={styles.titleContainer}>
+    <SafeAreaView style={styles.containerInputScreen}>
+      <View style={styles.containerInputBar}>
+        <View style={styles.containeTitle}>
           <Text style={styles.textInputBar}>タイトル</Text>
           <TextInput
-            style={styles.inputBar}
+            style={styles.styleInputBar}
             placeholder="タイトルを入力してください"
             value={todo.title}
             onChangeText={(text) =>
@@ -162,7 +161,7 @@ export default function InputTodo({ route }) {
           />
         </View>
 
-        <View style={styles.duedayContainer}>
+        <View style={styles.containerDueday}>
           <Text style={styles.textInputBar}>期限</Text>
           <DateTimePickerModal
             isVisible={datePickerVisibility}
@@ -172,7 +171,7 @@ export default function InputTodo({ route }) {
           />
           <View>
             <TextInput
-              style={styles.inputBar}
+              style={styles.styleInputBar}
               placeholder="期限を入力してください"
               value={todo.dueday}
               height={35}
@@ -182,9 +181,9 @@ export default function InputTodo({ route }) {
           </View>
         </View>
 
-        <View style={styles.commemtContainer}>
+        <View style={styles.containerCommemt}>
           <Text style={styles.textInputBar}>コメント</Text>
-          <View style={styles.commemtBox}>
+          <View style={styles.styleCommemtBox}>
             <TextInput
               style={{
                 textAlignVertical: "top",
@@ -208,16 +207,19 @@ export default function InputTodo({ route }) {
         </View>
       </View>
 
-      <View style={styles.buttonContainer}>
+      <View style={styles.containerButton}>
         <Pressable
-          style={styles.button}
+          style={styles.styleButton}
           onPress={onPressAdd}
           disabled={!isInputedTitle}
         >
           <Text style={styleButtonOK}>OK</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => navigation.goBack()}>
-          <Text style={styles.customBtnText}>キャンセル</Text>
+        <Pressable
+          style={styles.styleButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.styleTextBtn}>キャンセル</Text>
         </Pressable>
       </View>
     </SafeAreaView>

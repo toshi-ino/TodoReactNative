@@ -5,6 +5,7 @@ import { ProgressBar } from "react-native-paper";
 import { updateTodo } from "../src/graphql/mutations";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { API, graphqlOperation } from "aws-amplify";
+import { useNavigation } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   topContainer: {
@@ -117,8 +118,9 @@ const styles = StyleSheet.create({
 });
 
 export const TodoList = (props) => {
-  const { todos, navigation, isOverTodoNUmber } = props;
+  const { todos, isOverTodoNUmber } = props;
   const [checked, setChecked] = useState(false);
+  const navigation = useNavigation();
 
   async function onPressCheckBox(index) {
     todos[index].checked = !todos[index].checked;
@@ -157,14 +159,7 @@ export const TodoList = (props) => {
 
   const onPressDetail = (id) => {
     navigation.navigate("Detail", {
-      navigation: navigation,
       idDetail: id,
-    });
-  };
-
-  const onPressInput = (id) => {
-    navigation.navigate("Input", {
-      navigation: navigation,
     });
   };
 
@@ -183,7 +178,9 @@ export const TodoList = (props) => {
         </Pressable>
         <Pressable
           style={styles.button}
-          onPress={onPressInput}
+          onPress={() => {
+            navigation.navigate("Input");
+          }}
           disabled={isOverTodoNUmber}
         >
           <Icon name="plus-circle" size={18} color="white" />

@@ -89,8 +89,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function EditTodo({ route }) {
-  const { idEdit, navigation } = route.params;
+export default function EditTodo({ navigation, route }) {
+  const { idEdit } = route.params;
   const [todo, setTodo] = useState({});
   const [datePickerVisibility, setDatePickerVisibility] = useState(false);
 
