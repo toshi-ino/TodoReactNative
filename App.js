@@ -12,7 +12,6 @@ Amplify.configure({
   },
 });
 
-// export default function App() {
 const App = () => {
   return <AppNavigator />;
 };

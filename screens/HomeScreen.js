@@ -61,9 +61,9 @@ export default function HomeScreen(props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {todos.length >= 5 && (
+      {/* {todos.length >= 5 && (
         <Text style={{ color: "red" }}>登録できるtodoは5個まで</Text>
-      )}
+      )} */}
 
       <View style={styles.containerButttonSignout}>
         <Pressable

@@ -222,11 +222,11 @@ export default function DetailTodo({ navigation, route }) {
   const indicateDate = (date) => {
     let dateChanged = "";
     if (date == null) {
-      return (dateChanged = "");
+      dateChanged = "";
     } else if (typeof date === "string") {
-      return (dateChanged = convertFromStringToDate(date));
+      dateChanged = convertFromStringToDate(date);
     } else {
-      return (dateChanged = "");
+      dateChanged = "";
     }
 
     return dateChanged;
@@ -247,33 +247,31 @@ export default function DetailTodo({ navigation, route }) {
     );
     dateDate.setHours(dateDate.getHours() + 9);
 
-    dateComponents = [];
-    datePieces = [];
-    timePieces = [];
-    const dateDateJp = dateDate.toLocaleString("ja");
+    let yearStr = dateDate.getFullYear();
+    let monthStr = 1 + dateDate.getMonth();
+    let dayStr = dateDate.getDate();
+    let hourStr = dateDate.getHours();
+    let minuteStr = dateDate.getMinutes();
+    let secondStr = dateDate.getSeconds();
 
-    dateComponents = String(dateDateJp).split(" ");
-    datePieces = String(dateComponents[0]).split("/");
-    timePieces = String(dateComponents[1]).split(":");
+    monthStr = ("0" + monthStr).slice(-2);
+    dayStr = ("0" + dayStr).slice(-2);
+    hourStr = ("0" + hourStr).slice(-2);
+    minuteStr = ("0" + minuteStr).slice(-2);
+    secondStr = ("0" + secondStr).slice(-2);
 
-    if (String(datePieces[1]).length === 1) {
-      datePieces[1] = "0" + datePieces[1];
-    }
-    if (String(timePieces[0]).length === 1) {
-      timePieces[0] = "0" + timePieces[0];
-    }
     let dateChanged =
-      datePieces[0] +
+      yearStr +
       "/" +
-      datePieces[1] +
+      monthStr +
       "/" +
-      datePieces[2] +
+      dayStr +
       " " +
-      timePieces[0] +
+      hourStr +
       ":" +
-      timePieces[1] +
+      minuteStr +
       ":" +
-      timePieces[2];
+      secondStr;
 
     return dateChanged;
   };

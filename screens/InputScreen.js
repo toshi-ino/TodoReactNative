@@ -7,6 +7,9 @@ import {
   Pressable,
   SafeAreaView,
   Alert,
+  Keyboard,
+  InputAccessoryView,
+  Platform,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { API, graphqlOperation } from "aws-amplify";
@@ -58,7 +61,7 @@ const styles = StyleSheet.create({
     width: "90%",
     alignItems: "flex-end",
     justifyContent: "flex-end",
-    marginBottom: 50,
+    marginBottom: 30,
     marginEnd: 20,
     flexDirection: "row",
   },
@@ -84,6 +87,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     fontWeight: "bold",
   },
+  buttonEndKeybord: {
+    width: 60,
+    alignItems: "center",
+    padding: 10,
+  },
+  textButtonEndKeybord: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#00BFFF",
+  },
 });
 
 export default function InputTodo({ navigation }) {
@@ -93,8 +106,11 @@ export default function InputTodo({ navigation }) {
     commemt: "",
     checked: false,
   });
-
   const [datePickerVisibility, setDatePickerVisibility] = useState(false);
+
+  const isIOS = Platform.OS === "ios" ? true : false;
+  const inputAccessoryViewID = isIOS === true ? "endKeyboard" : null;
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -107,7 +123,7 @@ export default function InputTodo({ navigation }) {
     const selectedDate =
       date.getFullYear() +
       "年" +
-      date.getMonth() +
+      (date.getMonth() + 1) +
       "月" +
       date.getDate() +
       "日";
@@ -202,6 +218,8 @@ export default function InputTodo({ navigation }) {
               }
               height={4 * 17}
               maxLength={150}
+              inputAccessoryViewID={inputAccessoryViewID}
+              // showSoftInputOnFocus={false}
             />
           </View>
         </View>
@@ -222,6 +240,21 @@ export default function InputTodo({ navigation }) {
           <Text style={styles.styleTextBtn}>キャンセル</Text>
         </Pressable>
       </View>
+      {isIOS && (
+        <InputAccessoryView
+          nativeID={inputAccessoryViewID}
+          backgroundColor="hsl(0, 0%, 95%)"
+        >
+          <View style={{ alignItems: "flex-end" }}>
+            <Pressable
+              style={styles.buttonEndKeybord}
+              onPress={() => Keyboard.dismiss()}
+            >
+              <Text style={styles.textButtonEndKeybord}>完了</Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      )}
     </SafeAreaView>
   );
 }

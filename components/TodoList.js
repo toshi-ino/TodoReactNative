@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { CheckBox } from "react-native-elements";
-import { ProgressBar } from "react-native-paper";
+// import { ProgressBar } from "react-native-paper";
 import { updateTodo } from "../src/graphql/mutations";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { API, graphqlOperation } from "aws-amplify";
 import { useNavigation } from "@react-navigation/native";
+import { Bar as ProgressBar } from "react-native-progress";
 
 const styles = StyleSheet.create({
   topContainer: {
@@ -17,6 +18,10 @@ const styles = StyleSheet.create({
     marginTop: 50,
     fontSize: 35,
     color: "#00BFFF",
+  },
+  textOverTodoNumber: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonContainer: {
     marginTop: 30,
@@ -40,6 +45,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
   },
+  buttonDesable: {
+    borderRadius: 20,
+    height: 30,
+    width: 140,
+    backgroundColor: "gray",
+    marginStart: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
   buttonTransparent: {
     borderRadius: 20,
     height: 30,
@@ -53,10 +68,9 @@ const styles = StyleSheet.create({
     marginEnd: 10,
   },
   styleProgressBar: {
-    height: 7,
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
+    borderWidth: 1,
     backgroundColor: "#A7F1FF",
+    borderColor: "transparent",
   },
   centerContainerNullTodo: {
     flex: 1,
@@ -154,7 +168,7 @@ export const TodoList = (props) => {
       ratio = 0;
     }
 
-    return ratio.toFixed(2);
+    return Number(ratio.toFixed(2));
   };
 
   const onPressDetail = (id) => {
@@ -164,6 +178,8 @@ export const TodoList = (props) => {
   };
 
   const isNullTodos = todos.length === 0 ? true : false;
+  const colorButtonInput =
+    !isOverTodoNUmber === true ? styles.button : styles.buttonDesable;
 
   return (
     <View>
@@ -171,13 +187,19 @@ export const TodoList = (props) => {
         <Text style={styles.textTop}>TODO</Text>
       </View>
 
+      {todos.length >= 5 && (
+        <View style={styles.textOverTodoNumber}>
+          <Text style={{ color: "red" }}>登録できるtodoは5個まで</Text>
+        </View>
+      )}
+
       <View style={styles.buttonContainer}>
         {/* 位置調整を簡単にするために透明のボタンを配置する */}
         <Pressable style={styles.buttonTransparent}>
           <Text></Text>
         </Pressable>
         <Pressable
-          style={styles.button}
+          style={colorButtonInput}
           onPress={() => {
             navigation.navigate("Input");
           }}
@@ -191,11 +213,16 @@ export const TodoList = (props) => {
       <View style={styles.listContainer}>
         {isNullTodos && (
           <View>
-            <ProgressBar
+            {/* <ProgressBar
+              progress={Number(checkedCount())}
+              // style={styles.styleProgressBar}
+              width={10}
+            /> */}
+            {/* <ProgressBar
               progress={checkedCount()}
               color={"#00BFFF"}
               style={styles.styleProgressBar}
-            />
+            /> */}
             <View style={styles.boxOutline}>
               <View style={styles.centerContainerNullTodo}>
                 <Text style={styles.textStyleNullTodo}>Todoがありません</Text>
@@ -214,6 +241,9 @@ export const TodoList = (props) => {
                   progress={checkedCount()}
                   color={"#00BFFF"}
                   style={styles.styleProgressBar}
+                  width={null}
+                  height={4}
+                  borderRadius={3}
                 />
               )}
               <View style={styles.boxOutline}>
